@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent, FC } from "react";
 
 interface CustomInputProps {
   value: string;
@@ -6,14 +6,22 @@ interface CustomInputProps {
   name?: string;
   labelText?: string;
   type?: string;
+  labelClassName?: string;
+  labelComponent?: any; //TODO try to change any for something better
+  inputClassName?: string;
+  inputComponent?: any; //TODO try to change any for something better
 }
 
-const CustomInput: React.FC<CustomInputProps> = ({
+const CustomInput: FC<CustomInputProps> = ({
   value,
   onChange,
   name,
   labelText,
   type = "text",
+  labelClassName,
+  inputClassName,
+  labelComponent: LabelComponent,
+  inputComponent: InputComponent,
 }) => {
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (typeof onChange === "function") {
@@ -21,10 +29,29 @@ const CustomInput: React.FC<CustomInputProps> = ({
     }
   };
 
-  const input = <input type={type} value={value} onChange={onChangeHandler} />;
+  const input = !!InputComponent ? (
+    <InputComponent type={type} value={value} onChange={onChangeHandler} />
+  ) : (
+    <input
+      className={inputClassName}
+      type={type}
+      value={value}
+      onChange={onChangeHandler}
+    />
+  );
+
+  if (!!LabelComponent) {
+    return !!labelText ? (
+      <LabelComponent>
+        {labelText} {input}
+      </LabelComponent>
+    ) : (
+      input
+    );
+  }
 
   return !!labelText ? (
-    <label>
+    <label className={labelClassName}>
       {labelText} {input}
     </label>
   ) : (
