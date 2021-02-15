@@ -13,7 +13,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "luckydev.react-custom/custom-input@0.0.1": {
+    "luckydev.react-custom/custom-input@0.0.2": {
         "files": [
             {
                 "relativePath": "src/components/custom-input.tsx",

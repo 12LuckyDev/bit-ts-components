@@ -10,6 +10,8 @@ interface CustomInputProps {
   labelComponent?: any; //TODO try to change any for something better
   inputClassName?: string;
   inputComponent?: any; //TODO try to change any for something better
+  labelTextClassName?: string;
+  labelTextComponent?: any; //TODO try to change any for something better
 }
 
 const CustomInput: FC<CustomInputProps> = ({
@@ -20,8 +22,10 @@ const CustomInput: FC<CustomInputProps> = ({
   type = "text",
   labelClassName,
   inputClassName,
+  labelTextClassName,
   labelComponent: LabelComponent,
   inputComponent: InputComponent,
+  labelTextComponent: LabelTextComponent,
 }) => {
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (typeof onChange === "function") {
@@ -40,10 +44,19 @@ const CustomInput: FC<CustomInputProps> = ({
     />
   );
 
+  const labelTextElement = !!LabelTextComponent ? (
+    <LabelTextComponent>{labelText}</LabelTextComponent>
+  ) : !!labelTextClassName ? (
+    <span className={labelTextClassName}>{labelText}</span>
+  ) : (
+    labelText
+  );
+
   if (!!LabelComponent) {
     return !!labelText ? (
       <LabelComponent>
-        {labelText} {input}
+        {labelTextElement}
+        {input}
       </LabelComponent>
     ) : (
       input
@@ -52,7 +65,8 @@ const CustomInput: FC<CustomInputProps> = ({
 
   return !!labelText ? (
     <label className={labelClassName}>
-      {labelText} {input}
+      {labelTextElement}
+      {input}
     </label>
   ) : (
     input
