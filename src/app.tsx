@@ -18,7 +18,7 @@ const App = () => {
           console.log(v);
         }}
       />
-      <CustomButton component={StyledButton} text="xDDD" onClick={() => {}} />
+      <CustomButton component={StyledButton} name="sss" text="xDDD" onClick={() => {}} />
     </div>
   );
 };

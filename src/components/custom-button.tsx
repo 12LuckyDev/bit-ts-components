@@ -7,6 +7,7 @@ interface CustomButtonProps {
   type?: "button" | "submit" | "reset";
   className?: string;
   component?: any; //TODO try to change any for something better
+  componentProps?: { [key: string]: unknown };
 }
 
 const CustomButton: FC<CustomButtonProps> = ({
@@ -16,6 +17,7 @@ const CustomButton: FC<CustomButtonProps> = ({
   type = "button",
   className,
   component: Component,
+  componentProps,
 }) => {
   if (type === "button") {
     const onClickHandler = () => {
@@ -25,7 +27,7 @@ const CustomButton: FC<CustomButtonProps> = ({
     };
 
     return !!Component ? (
-      <Component type={type} onClick={onClickHandler}>
+      <Component type={type} onClick={onClickHandler} {...componentProps}>
         {text}
       </Component>
     ) : (
@@ -36,9 +38,7 @@ const CustomButton: FC<CustomButtonProps> = ({
   }
 
   return !!Component ? (
-    <Component type={type}>
-      {text}
-    </Component>
+    <Component type={type}>{text}</Component>
   ) : (
     <button className={className} type={type}>
       {text}
