@@ -1,76 +1,35 @@
-import { ChangeEvent, FC } from "react";
+import { FC } from "react";
+import CustomInputBase from "./custom-input-base";
+import CustomInputBaseProps from "./props-interfaces/custom-input-base-props";
+import CustomLabel from "./custom-label";
+import CustomWithLabelProps from "./props-interfaces/custom-with-label-props";
+import CustomLabelProps from "./props-interfaces/custom-label-props";
 
-interface CustomInputProps {
-  value: string;
-  onChange: (value: string, name?: string) => void;
-  name?: string;
-  labelText?: string;
-  type?: string;
-  labelClassName?: string;
-  labelComponent?: any; //TODO try to change any for something better
-  inputClassName?: string;
-  inputComponent?: any; //TODO try to change any for something better
-  labelTextClassName?: string;
-  labelTextComponent?: any; //TODO try to change any for something better
-}
+interface CustomInputProps extends CustomInputBaseProps, CustomWithLabelProps {}
 
 const CustomInput: FC<CustomInputProps> = ({
-  value,
-  onChange,
-  name,
   labelText,
-  type = "text",
   labelClassName,
-  inputClassName,
   labelTextClassName,
-  labelComponent: LabelComponent,
-  inputComponent: InputComponent,
-  labelTextComponent: LabelTextComponent,
+  labelComponent,
+  labelTextComponent,
+  ...baseInputProps
 }) => {
-  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (typeof onChange === "function") {
-      onChange(e.target.value, name);
-    }
-  };
+  const input = <CustomInputBase {...baseInputProps} />;
 
-  const input = !!InputComponent ? (
-    <InputComponent type={type} value={value} onChange={onChangeHandler} />
-  ) : (
-    <input
-      className={inputClassName}
-      type={type}
-      value={value}
-      onChange={onChangeHandler}
-    />
-  );
-
-  const labelTextElement = !!LabelTextComponent ? (
-    <LabelTextComponent>{labelText}</LabelTextComponent>
-  ) : !!labelTextClassName ? (
-    <span className={labelTextClassName}>{labelText}</span>
-  ) : (
-    labelText
-  );
-
-  if (!!LabelComponent) {
-    return !!labelText ? (
-      <LabelComponent>
-        {labelTextElement}
-        {input}
-      </LabelComponent>
-    ) : (
-      input
-    );
+  if (!labelText) {
+    return input;
   }
 
-  return !!labelText ? (
-    <label className={labelClassName}>
-      {labelTextElement}
-      {input}
-    </label>
-  ) : (
-    input
-  );
+  const labelProps: CustomLabelProps = {
+    labelText,
+    labelClassName,
+    labelTextClassName,
+    labelComponent,
+    labelTextComponent,
+  };
+
+  return <CustomLabel {...labelProps}>{input}</CustomLabel>;
 };
 
 export default CustomInput;
