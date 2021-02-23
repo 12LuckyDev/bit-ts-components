@@ -31,7 +31,7 @@ const valueChecker = (value: valueType | string): boolean => {
 const valueValidator = (value: string | null): boolean =>
   !isNaN(Number(value)) || value === "-";
 
-//TODO add precision for example 2 means you can have max 2 numbers after . -> 10.01 ok 10.001 no ok... use toFixed? 
+//TODO add precision for example 2 means you can have max 2 numbers after . -> 10.01 ok 10.001 no ok... use toFixed?
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   buttonsComponent,
@@ -69,9 +69,11 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
         useLocalValue.current = true;
         setLocalValue({ v: newValue });
       } else {
-        useLocalValue.current = false;
-        onChange(newValue !== "" ? Number(newValue) : null, name);
-        if (newValue === value?.toString()) {
+        if (newValue !== value?.toString()) {
+          useLocalValue.current = false;
+          onChange(newValue !== "" ? Number(newValue) : null, name);
+        } else {
+          useLocalValue.current = true;
           setLocalValue({ v: newValue });
         }
       }
