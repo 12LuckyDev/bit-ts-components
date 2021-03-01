@@ -18,20 +18,59 @@ interface CustomNumberInputProps extends CustomWithLabelProps {
   inputWrapperClassName?: string;
   valueType?: "string" | "number";
   step?: number;
+  precision?: number;
 }
 
+const isInt = (value: number | string): boolean => {
+  return !value.toString().includes(".");
+};
+
+const parseValue = (value: string): valueType => {
+  return value === "" ? null : Number(value);
+};
+
+/**
+ * Checks if component should display localValue or props value
+ * @param value string value from input change event
+ */
 const valueChecker = (value: valueType | string): boolean => {
   if (value === null) {
     return false;
   }
   const strValue = value.toString();
-  return strValue[strValue.length - 1] === "." || strValue === "-";
+  const lastChar = strValue[strValue.length - 1];
+  return (
+    lastChar === "." || (!isInt(value) && lastChar === "0") || strValue === "-"
+  );
 };
 
-const valueValidator = (value: string | null): boolean =>
-  !isNaN(Number(value)) || value === "-";
+const getValuePrecision = (value: string | number | null): number | null => {
+  if (value === null) {
+    return null;
+  }
 
-//TODO add precision for example 2 means you can have max 2 numbers after . -> 10.01 ok 10.001 no ok... use toFixed?
+  const valueStr = value.toString();
+  const index = valueStr.indexOf(".");
+  if (index > -1) {
+    return valueStr.length - index - 1;
+  }
+  return null;
+};
+
+/**
+ * Checks if value is valid to display in input (can't be NaN but '-' will pass)
+ * @param value string value from input change event
+ */
+const valueValidator = (value: string | null, precision?: number): boolean => {
+  if (!isNaN(Number(value)) || value === "-") {
+    if (precision !== undefined) {
+      const valuePrecision = getValuePrecision(value);
+      return valuePrecision === null ? true : valuePrecision <= precision;
+    }
+    return true;
+  }
+  return false;
+};
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   buttonsComponent,
@@ -43,39 +82,59 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   onChange,
   valueType = "number",
   step = 1,
+  precision = 2,
   labelText,
   ...labelProps
 }) => {
   const [localValue, setLocalValue] = useState<{ v: string }>({ v: "" });
-  const useLocalValue = useRef<boolean>(valueChecker(value));
+  const useLocalValue = useRef<boolean>(false);
 
   const onClick = (action: string | undefined) => {
     if (isFunc(onChange)) {
-      const currentNumericValue = Number(value) === NaN ? 0 : Number(value);
-      if (action === "+") {
-        onChange(currentNumericValue + step, name);
-      } else {
-        onChange(currentNumericValue - step, name);
-      }
+      const valuePrecision = getValuePrecision(value);
+
+      const toPrecision = !precision
+        ? !valuePrecision
+          ? 0
+          : valuePrecision
+        : precision;
+
+      const currentNumericValue = Number(value);
+      const newValue =
+        action === "+"
+          ? Number((currentNumericValue + step).toFixed(toPrecision))
+          : Number((currentNumericValue - step).toFixed(toPrecision));
+
+      onChangeWrapper(newValue, localValue.v, false);
     }
   };
 
-  const onChangeHandler = (newValue: string, name?: string) => {
-    if (!valueValidator(newValue)) {
-      useLocalValue.current = true;
-      setLocalValue(localValue);
-    } else if (isFunc(onChange)) {
-      if (valueChecker(newValue)) {
-        useLocalValue.current = true;
-        setLocalValue({ v: newValue });
-      } else {
-        if (newValue !== value?.toString()) {
-          useLocalValue.current = false;
-          onChange(newValue !== "" ? Number(newValue) : null, name);
-        } else {
-          useLocalValue.current = true;
-          setLocalValue({ v: newValue });
-        }
+  const onChangeHandler = (newValue: string) => {
+    if (!valueValidator(newValue, precision)) {
+      console.log("UNVALID!", newValue);
+      // UNVALID STRING!! VALUE STAYS THE SAME, DON'T CHANGE STRING IN INPUT
+      onChangeWrapper(value, localValue.v, true);
+    } else {
+      onChangeWrapper(parseValue(newValue), newValue, valueChecker(newValue));
+    }
+  };
+
+  const onChangeWrapper = (
+    newValue: valueType,
+    newLocalValue: string,
+    useLocal: boolean
+  ) => {
+    useLocalValue.current = useLocal;
+
+    if (newLocalValue !== localValue.v) {
+      console.log("LOCAL CHANGE", newLocalValue);
+      setLocalValue({ v: newLocalValue });
+    }
+
+    if (isFunc(onChange)) {
+      if ((newValue === null || !isNaN(newValue)) && newValue !== value) {
+        console.log("ONCHANGE", newValue);
+        onChange(newValue, name);
       }
     }
   };
