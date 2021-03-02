@@ -34,6 +34,16 @@ const App = () => {
         }}
         value={number}
         labelText="NUMBER TEST"
+        displayType="end"
+      />
+      <CustomNumberInput
+        name="number"
+        onChange={(value) => {
+          setNumber(value);
+        }}
+        value={number}
+        labelText="NUMBER TEST"
+        displayType="around"
       />
     </div>
   );

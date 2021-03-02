@@ -1,7 +1,7 @@
 import React from "react";
 
 interface CustomDivWrapperProps {
-  children: JSX.Element | JSX.Element[];
+  children: JSX.Element | JSX.Element[] | null | (JSX.Element | null)[];
   component?: any; //TODO try to change any for something better
   className?: string;
 }

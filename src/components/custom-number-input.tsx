@@ -16,9 +16,9 @@ interface CustomNumberInputProps extends CustomWithLabelProps {
   buttonsClassName?: string;
   inputWrapperComponent?: any; //TODO try to change any for something better
   inputWrapperClassName?: string;
-  valueType?: "string" | "number";
   step?: number;
   precision?: number;
+  displayType?: "around" | "end";
 }
 
 const isInt = (value: number | string): boolean => {
@@ -44,6 +44,10 @@ const valueChecker = (value: valueType | string): boolean => {
   );
 };
 
+/**
+ * Extract precision from value
+ * @param value string value from input change event
+ */
 const getValuePrecision = (value: string | number | null): number | null => {
   if (value === null) {
     return null;
@@ -57,12 +61,21 @@ const getValuePrecision = (value: string | number | null): number | null => {
   return null;
 };
 
+const validateSaveInt = (value: number): boolean => {
+  return !(value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER);
+};
+
 /**
  * Checks if value is valid to display in input (can't be NaN but '-' will pass)
  * @param value string value from input change event
  */
 const valueValidator = (value: string | null, precision?: number): boolean => {
-  if (!isNaN(Number(value)) || value === "-") {
+  const numberValue = Number(value);
+  if (!isNaN(numberValue) || value === "-") {
+    if (!validateSaveInt(numberValue)) {
+      return false;
+    }
+
     if (precision !== undefined) {
       const valuePrecision = getValuePrecision(value);
       return valuePrecision === null ? true : valuePrecision <= precision;
@@ -80,9 +93,9 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   name,
   value,
   onChange,
-  valueType = "number",
   step = 1,
-  precision = 2,
+  precision,
+  displayType = "end",
   labelText,
   ...labelProps
 }) => {
@@ -104,8 +117,9 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
         action === "+"
           ? Number((currentNumericValue + step).toFixed(toPrecision))
           : Number((currentNumericValue - step).toFixed(toPrecision));
-
-      onChangeWrapper(newValue, localValue.v, false);
+      if (validateSaveInt(newValue)) {
+        onChangeWrapper(newValue, localValue.v, false);
+      }
     }
   };
 
@@ -139,29 +153,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
     }
   };
 
-  const baseElements = (
-    <CustomDivWrapper
-      component={inputWrapperComponent}
-      className={inputWrapperClassName}
-    >
-      <CustomButton
-        className={buttonsClassName}
-        component={buttonsComponent}
-        onClick={onClick}
-        name="-"
-        text="-"
-      />
-      <CustomInputBase
-        name={name}
-        value={
-          useLocalValue.current
-            ? localValue.v
-            : value !== null
-            ? value.toString()
-            : ""
-        }
-        onChange={onChangeHandler}
-      />
+  const plusButton = (
       <CustomButton
         className={buttonsClassName}
         component={buttonsComponent}
@@ -169,6 +161,43 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
         name="+"
         text="+"
       />
+    );
+
+  const minusButton = (
+    <CustomButton
+      className={buttonsClassName}
+      component={buttonsComponent}
+      onClick={onClick}
+      name="-"
+      text="-"
+    />
+  );
+
+  const input = (
+    <CustomInputBase
+      name={name}
+      value={
+        useLocalValue.current
+          ? localValue.v
+          : value !== null
+          ? value.toString()
+          : ""
+      }
+      onChange={onChangeHandler}
+    />
+  );
+
+  const elements =
+    displayType === "around"
+      ? [minusButton, input, plusButton]
+      : [input, minusButton, plusButton];
+
+  const baseElements = (
+    <CustomDivWrapper
+      component={inputWrapperComponent}
+      className={inputWrapperClassName}
+    >
+      {elements}
     </CustomDivWrapper>
   );
 
