@@ -33,6 +33,7 @@ const CustomNumberInputComponent: React.FC<CustomNumberInputWithMethodsProps> = 
       onClick={onClick}
       name="+"
       text="+"
+      key="+"
     />
   );
 
@@ -43,10 +44,11 @@ const CustomNumberInputComponent: React.FC<CustomNumberInputWithMethodsProps> = 
       onClick={onClick}
       name="-"
       text="-"
+      key="-"
     />
   );
 
-  const input = <CustomInputBase value={value} onChange={onChange} />;
+  const input = <CustomInputBase value={value} onChange={onChange} key="input" />;
 
   const elements =
     displayType === "around"
@@ -57,6 +59,7 @@ const CustomNumberInputComponent: React.FC<CustomNumberInputWithMethodsProps> = 
           <CustomDivWrapper
             className={buttonsWrapperClassName}
             component={buttonsWrapperComponent}
+            key="wrapper"
           >
             {minusButton}
             {plusButton}
