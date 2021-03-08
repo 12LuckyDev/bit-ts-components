@@ -10,6 +10,31 @@ const StyledButton = styled.button`
   color: blue;
 `;
 
+const StyledNumberButton = styled.button`
+  appearance: none;
+  width: 20rem;
+  max-width: 100%;
+  padding: 0.75rem 2rem;
+  outline: none;
+  border: 3px solid;
+  border-radius: 1.5rem;
+  background-color: transparent;
+  font-weight: bold;
+  color: #ffffff;
+  border-color: #ffffff;
+
+  transition: background-color 0.4s ease;
+
+  &:hover {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  &:active {
+    background-color: #747474;
+  }
+`;
+
 const App = () => {
   const [number, setNumber] = useState<number | null>(0);
   return (
@@ -55,6 +80,7 @@ const App = () => {
         value={number}
         labelText="NUMBER TEST"
         displayType="around"
+        buttonsComponent={StyledNumberButton}
       />
     </div>
   );
