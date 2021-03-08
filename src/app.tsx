@@ -43,6 +43,17 @@ const App = () => {
         }}
         value={number}
         labelText="NUMBER TEST"
+        displayType="end"
+        buttonsWrapperClassName="button-wrapper-test-class"
+        inputWrapperClassName="wrapper-test-class"
+      />
+      <CustomNumberInput
+        name="number"
+        onChange={(value) => {
+          setNumber(value);
+        }}
+        value={number}
+        labelText="NUMBER TEST"
         displayType="around"
       />
     </div>

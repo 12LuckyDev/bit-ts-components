@@ -1,24 +1,17 @@
 import React, { useRef, useState } from "react";
-import CustomInputBase from "./custom-input-base";
-import CustomButton from "./custom-button";
 import { isFunc } from "@12luckydev/utils";
 import CustomWithLabelProps from "./props-interfaces/custom-with-label-props";
-import CustomDivWrapper from "./custom-div-wrapper";
-import CustomLabel from "./custom-label";
+import CustomNumberInputComponent from "./custom-number-input-ui-component";
+import CustomNumberInputComponentProps from "./props-interfaces/custom-number-input-ui-component-props";
 
 type valueType = number | null;
 
-interface CustomNumberInputProps extends CustomWithLabelProps {
+interface CustomNumberInputProps extends CustomWithLabelProps, CustomNumberInputComponentProps {
   value: valueType;
   onChange: (value: valueType, name?: string) => void;
   name: string;
-  buttonsComponent?: any; //TODO try to change any for something better
-  buttonsClassName?: string;
-  inputWrapperComponent?: any; //TODO try to change any for something better
-  inputWrapperClassName?: string;
   step?: number;
   precision?: number;
-  displayType?: "around" | "end";
 }
 
 const isInt = (value: number | string): boolean => {
@@ -86,23 +79,35 @@ const valueValidator = (value: string | null, precision?: number): boolean => {
 };
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
-  buttonsComponent,
-  buttonsClassName,
-  inputWrapperComponent,
-  inputWrapperClassName,
   name,
   value,
   onChange,
   step = 1,
   precision,
-  displayType = "end",
-  labelText,
-  ...labelProps
+  ...uiProps
 }) => {
   const [localValue, setLocalValue] = useState<{ v: string }>({ v: "" });
   const useLocalValue = useRef<boolean>(false);
 
-  const onClick = (action: string | undefined) => {
+  const onChangeWrapper = (
+    newValue: valueType,
+    newLocalValue: string,
+    useLocal: boolean
+  ) => {
+    useLocalValue.current = useLocal;
+
+    if (newLocalValue !== localValue.v) {
+      setLocalValue({ v: newLocalValue });
+    }
+
+    if (isFunc(onChange)) {
+      if ((newValue === null || !isNaN(newValue)) && newValue !== value) {
+        onChange(newValue, name);
+      }
+    }
+  };
+
+  const onClickHandler = (action: string | undefined) => {
     if (isFunc(onChange)) {
       const valuePrecision = getValuePrecision(value);
 
@@ -125,7 +130,6 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
 
   const onChangeHandler = (newValue: string) => {
     if (!valueValidator(newValue, precision)) {
-      console.log("UNVALID!", newValue);
       // UNVALID STRING!! VALUE STAYS THE SAME, DON'T CHANGE STRING IN INPUT
       onChangeWrapper(value, localValue.v, true);
     } else {
@@ -133,80 +137,19 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
     }
   };
 
-  const onChangeWrapper = (
-    newValue: valueType,
-    newLocalValue: string,
-    useLocal: boolean
-  ) => {
-    useLocalValue.current = useLocal;
+  const dispValue = useLocalValue.current
+    ? localValue.v
+    : value !== null
+    ? value.toString()
+    : "";
 
-    if (newLocalValue !== localValue.v) {
-      console.log("LOCAL CHANGE", newLocalValue);
-      setLocalValue({ v: newLocalValue });
-    }
-
-    if (isFunc(onChange)) {
-      if ((newValue === null || !isNaN(newValue)) && newValue !== value) {
-        console.log("ONCHANGE", newValue);
-        onChange(newValue, name);
-      }
-    }
-  };
-
-  const plusButton = (
-      <CustomButton
-        className={buttonsClassName}
-        component={buttonsComponent}
-        onClick={onClick}
-        name="+"
-        text="+"
-      />
-    );
-
-  const minusButton = (
-    <CustomButton
-      className={buttonsClassName}
-      component={buttonsComponent}
-      onClick={onClick}
-      name="-"
-      text="-"
-    />
-  );
-
-  const input = (
-    <CustomInputBase
-      name={name}
-      value={
-        useLocalValue.current
-          ? localValue.v
-          : value !== null
-          ? value.toString()
-          : ""
-      }
+  return (
+    <CustomNumberInputComponent
+      onClick={onClickHandler}
       onChange={onChangeHandler}
+      value={dispValue}
+      {...uiProps}
     />
-  );
-
-  const elements =
-    displayType === "around"
-      ? [minusButton, input, plusButton]
-      : [input, minusButton, plusButton];
-
-  const baseElements = (
-    <CustomDivWrapper
-      component={inputWrapperComponent}
-      className={inputWrapperClassName}
-    >
-      {elements}
-    </CustomDivWrapper>
-  );
-
-  return labelText ? (
-    <CustomLabel labelText={labelText} {...labelProps}>
-      {baseElements}
-    </CustomLabel>
-  ) : (
-    baseElements
   );
 };
 

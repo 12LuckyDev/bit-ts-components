@@ -13,7 +13,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "luckydev.react-custom/custom-div-wrapper@0.0.4": {
+    "luckydev.react-custom/custom-div-wrapper@0.0.5": {
         "files": [
             {
                 "relativePath": "src/components/custom-div-wrapper.tsx",
@@ -85,7 +85,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "luckydev.react-custom/custom-number-input@0.0.5": {
+    "luckydev.react-custom/custom-number-input@0.0.7": {
         "files": [
             {
                 "relativePath": "src/components/custom-number-input.tsx",
