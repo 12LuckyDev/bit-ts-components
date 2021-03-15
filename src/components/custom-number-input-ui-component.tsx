@@ -10,6 +10,8 @@ interface CustomNumberInputWithMethodsProps
   onClick: (action: string | undefined) => void;
   onChange: (newValue: string) => void;
   value: string;
+  inputComponent?: any;//TODO try to change any for something better
+  inputClassName?: string;
 }
 
 const CustomNumberInputComponent: React.FC<CustomNumberInputWithMethodsProps> = ({

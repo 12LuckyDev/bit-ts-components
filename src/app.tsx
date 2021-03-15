@@ -10,6 +10,11 @@ const StyledButton = styled.button`
   color: blue;
 `;
 
+const StyledInput = styled.input`
+  background: green;
+  color: white;
+`;
+
 const StyledNumberButton = styled.button`
   appearance: none;
   width: 20rem;
@@ -71,6 +76,7 @@ const App = () => {
         displayType="end"
         buttonsWrapperClassName="button-wrapper-test-class"
         inputWrapperClassName="wrapper-test-class"
+        inputComponent={StyledInput}
       />
       <CustomNumberInput
         name="number"

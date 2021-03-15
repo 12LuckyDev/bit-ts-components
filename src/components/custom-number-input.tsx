@@ -6,7 +6,13 @@ import CustomNumberInputComponentProps from "./props-interfaces/custom-number-in
 
 type valueType = number | null;
 
-interface CustomNumberInputProps extends CustomWithLabelProps, CustomNumberInputComponentProps {
+// TODO
+// -disable input (only use buttons) - props
+// min/max
+
+interface CustomNumberInputProps
+  extends CustomWithLabelProps,
+    CustomNumberInputComponentProps {
   value: valueType;
   onChange: (value: valueType, name?: string) => void;
   name: string;
